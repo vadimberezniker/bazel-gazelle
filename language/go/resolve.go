@@ -64,6 +64,8 @@ func (_ *goLang) Embeds(r *rule.Rule, from label.Label) []label.Label {
 }
 
 func (gl *goLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, importsRaw interface{}, from label.Label) {
+	log.Printf("START GO RESOLVER %s", r.Kind())
+	defer log.Printf("DONE GO RESOLVER")
 	if importsRaw == nil {
 		// may not be set in tests.
 		return
@@ -75,7 +77,9 @@ func (gl *goLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Remo
 		resolve = resolveProto
 	}
 	deps, errs := imports.Map(func(imp string) (string, error) {
+		log.Printf("resolve import %s", imp)
 		l, err := resolve(c, ix, rc, imp, from)
+		log.Printf("done resolve import %s", imp)
 		if err == skipImportError {
 			return "", nil
 		} else if err != nil {

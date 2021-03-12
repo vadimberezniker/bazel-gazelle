@@ -57,7 +57,7 @@ func (cmd command) String() string {
 
 func main() {
 	log.SetPrefix("gazelle: ")
-	log.SetFlags(0) // don't print timestamps
+	// log.SetFlags(0) // don't print timestamps
 
 	if err := run(os.Args[1:]); err != nil && err != flag.ErrHelp {
 		if err == exitError {
