@@ -273,6 +273,7 @@ func runFixUpdate(cmd command, args []string) (err error) {
 	var visits []visitRecord
 	uc := getUpdateConfig(c)
 	walk.Walk(c, cexts, uc.dirs, uc.walkMode, func(dir, rel string, c *config.Config, update bool, f *rule.File, subdirs, regularFiles, genFiles []string) {
+		log.Printf("walk dir: %s", dir)
 		// If this file is ignored or if Gazelle was not asked to update this
 		// directory, just index the build file and move on.
 		if !update {
@@ -284,6 +285,7 @@ func runFixUpdate(cmd command, args []string) (err error) {
 			return
 		}
 
+		log.Printf("language fixes: %s", dir)
 		// Fix any problems in the file.
 		if f != nil {
 			for _, l := range filterLanguages(c, languages) {
@@ -291,6 +293,7 @@ func runFixUpdate(cmd command, args []string) (err error) {
 			}
 		}
 
+		log.Printf("generate rules: %s", dir)
 		// Generate rules.
 		var empty, gen []*rule.Rule
 		var imports []interface{}
@@ -330,6 +333,8 @@ func runFixUpdate(cmd command, args []string) (err error) {
 			}
 		}
 
+		log.Printf("insert/update rules: %s", dir)
+
 		// Insert or merge rules into the build file.
 		if f == nil {
 			f = rule.EmptyFile(filepath.Join(dir, c.DefaultBuildFileName()), rel)
@@ -362,6 +367,8 @@ func runFixUpdate(cmd command, args []string) (err error) {
 	// Finish building the index for dependency resolution.
 	ruleIndex.Finish()
 
+	log.Printf("resolve dependencies")
+
 	// Resolve dependencies.
 	rc, cleanupRc := repo.NewRemoteCache(uc.repos)
 	defer func() {
@@ -377,6 +384,8 @@ func runFixUpdate(cmd command, args []string) (err error) {
 		merger.MergeFile(v.file, v.empty, v.rules, merger.PostResolve,
 			unionKindInfoMaps(kinds, v.mappedKindInfo))
 	}
+
+	log.Printf("emit merged files")
 
 	// Emit merged files.
 	var exit error
@@ -395,6 +404,8 @@ func runFixUpdate(cmd command, args []string) (err error) {
 			return err
 		}
 	}
+
+	log.Printf("done")
 
 	return exit
 }
