@@ -377,7 +377,9 @@ func runFixUpdate(cmd command, args []string) (err error) {
 		}
 	}()
 	for _, v := range visits {
+		log.Printf("resolve %s", v.pkgRel)
 		for i, r := range v.rules {
+			log.Printf("resolve rule: %s", r.Name())
 			from := label.New(c.RepoName, v.pkgRel, r.Name())
 			mrslv.Resolver(r, v.pkgRel).Resolve(v.c, ruleIndex, rc, r, v.imports[i], from)
 		}
