@@ -282,8 +282,10 @@ func resolveExternal(moduleMode bool, rc *repo.RemoteCache, imp string) (label.L
 	var prefix, repo string
 	var err error
 	if moduleMode {
+		log.Printf("mod mode")
 		prefix, repo, err = rc.Mod(imp)
 	} else {
+		log.Printf("non-mod mode")
 		prefix, repo, err = rc.Root(imp)
 	}
 	if err != nil {

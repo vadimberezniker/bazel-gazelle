@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -221,6 +222,8 @@ func (r *RemoteCache) Root(importPath string) (root, name string, err error) {
 	// to vcs yet. We do this before handling known special cases because
 	// the cache is pre-populated with repository rules, and we want to use their
 	// names if we can.
+	log.Printf("root start")
+	defer log.Printf("root done")
 	prefix := importPath
 	for {
 		v, ok, err := r.root.get(prefix)
@@ -237,6 +240,8 @@ func (r *RemoteCache) Root(importPath string) (root, name string, err error) {
 			break
 		}
 	}
+
+	log.Printf("check known prefixes")
 
 	// Try known prefixes.
 	for _, p := range knownPrefixes {
@@ -265,6 +270,8 @@ func (r *RemoteCache) Root(importPath string) (root, name string, err error) {
 		name = label.ImportPathToBazelRepoName(root)
 		return root, name, nil
 	}
+
+	log.Printf("check vcs")
 
 	// Find the prefix using vcs and cache the result.
 	v, err := r.root.ensure(importPath, func() (interface{}, error) {
