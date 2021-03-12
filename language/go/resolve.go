@@ -120,6 +120,8 @@ var (
 // This may be used directly by other language extensions related to Go
 // (gomock). Gazelle calls Language.Resolve instead.
 func ResolveGo(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, imp string, from label.Label) (label.Label, error) {
+	log.Printf("RESOLVE GO")
+	defer log.Printf("DONE RESOLVE GO")
 	gc := getGoConfig(c)
 	pcMode := getProtoMode(c)
 	if build.IsLocalImport(imp) {
@@ -164,6 +166,7 @@ func ResolveGo(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, im
 		}
 	}
 
+	log.Printf("try index")
 	if l, err := resolveWithIndexGo(ix, imp, from); err == nil || err == skipImportError {
 		return l, err
 	} else if err != notFoundError {
@@ -260,6 +263,8 @@ func resolveWithIndexGo(ix *resolve.RuleIndex, imp string, from label.Label) (la
 var modMajorRex = regexp.MustCompile(`/v\d+(?:/|$)`)
 
 func resolveExternal(moduleMode bool, rc *repo.RemoteCache, imp string) (label.Label, error) {
+	log.Printf("resolve external")
+	defer log.Printf("done resolv external")
 	// If we're in module mode, use "go list" to find the module path and
 	// repository name. Otherwise, use special cases (for github.com, golang.org)
 	// or send a GET with ?go-get=1 to find the root. If the path contains
@@ -272,6 +277,8 @@ func resolveExternal(moduleMode bool, rc *repo.RemoteCache, imp string) (label.L
 		moduleMode = pathWithoutSemver(imp) != ""
 	}
 
+	log.Printf("resolve external 2")
+
 	var prefix, repo string
 	var err error
 	if moduleMode {
@@ -282,6 +289,8 @@ func resolveExternal(moduleMode bool, rc *repo.RemoteCache, imp string) (label.L
 	if err != nil {
 		return label.NoLabel, err
 	}
+
+	log.Printf("done resolve external 2")
 
 	var pkg string
 	if pathtools.HasPrefix(imp, prefix) {
